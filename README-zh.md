@@ -68,7 +68,8 @@
 
 ### 现成包（Windows x64，免编译）
 
-[`dist/FileEncoding-20.0.2-win64.zip`](dist/FileEncoding-20.0.2-win64.zip)（约 34 KB）是编译好的精简包，
+[`FileEncoding-20.0.2-win64.zip`](https://github.com/electri/qtc-fileencoding/releases/download/v20.0.2/FileEncoding-20.0.2-win64.zip)
+（约 35 KB，挂在 [v20.0.2 发布页](https://github.com/electri/qtc-fileencoding/releases/tag/v20.0.2)）是编译好的精简包，
 里面只有 `lib/qtcreator/plugins/FileEncoding.dll`、`README.txt`、`LICENSE.txt` 和 `SHA256.txt`：
 
 1. 关闭 Qt Creator；

@@ -76,8 +76,9 @@ including an English one.
 
 ### Prebuilt package (Windows x64)
 
-[`dist/FileEncoding-20.0.2-win64.zip`](dist/FileEncoding-20.0.2-win64.zip) (about 34 KB) is a
-minimal build: `lib/qtcreator/plugins/FileEncoding.dll`, `README.txt`, `LICENSE.txt`
+[`FileEncoding-20.0.2-win64.zip`](https://github.com/electri/qtc-fileencoding/releases/download/v20.0.2/FileEncoding-20.0.2-win64.zip)
+(about 35 KB, attached to the [v20.0.2 release](https://github.com/electri/qtc-fileencoding/releases/tag/v20.0.2))
+is a minimal build: `lib/qtcreator/plugins/FileEncoding.dll`, `README.txt`, `LICENSE.txt`
 and `SHA256.txt`, nothing else.
 
 1. Close Qt Creator.

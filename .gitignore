@@ -24,6 +24,5 @@ moc_*.cpp
 qrc_*.cpp
 ui_*.h
 
-# Local distribution packaging workspace (the zip itself is tracked)
-dist/stage/
-dist/verify/
+# Local distribution packaging workspace; the archive ships as a release asset
+dist/
