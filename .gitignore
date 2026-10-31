@@ -23,3 +23,6 @@ cmake_install.cmake
 moc_*.cpp
 qrc_*.cpp
 ui_*.h
+
+# Local distribution packages
+dist/
