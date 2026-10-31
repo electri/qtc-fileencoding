@@ -1,6 +1,6 @@
 {
     "Id" : "fileencoding",
-    "DisplayName" : "文件编码",
+    "DisplayName" : "编辑器快捷设置",
     "Name" : "FileEncoding",
     "Version" : "${IDE_VERSION}",
     "CompatVersion" : "${IDE_VERSION_COMPAT}",
@@ -11,7 +11,7 @@
                   "",
                   "This plugin is distributed under the terms of the GNU General Public License version 3 as published by the Free Software Foundation, with the Qt Creator exception as present in the file LICENSE.GPL3-EXCEPT of the Qt Creator sources."
     ],
-    "Description" : "Switches the default text file encoding between UTF-8 and GBK directly from the Tools menu and re-reads the already opened files with the new encoding.",
+    "Description" : "Switches the default text file encoding between UTF-8 and GBK and the text editor font size from the Tools menu, applying both to the already opened files.",
     "Url" : "https://www.qt.io/",
     ${IDE_PLUGIN_DEPENDENCIES}
 }

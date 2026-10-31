@@ -16,9 +16,12 @@
 #include <extensionsystem/iplugin.h>
 
 #include <texteditor/extraencodingsettings.h>
+#include <texteditor/fontsettings.h>
 #include <texteditor/textdocument.h>
 #include <texteditor/texteditor.h>
+#include <texteditor/texteditorsettings.h>
 
+#include <utils/qtcsettings.h>
 #include <utils/textcodec.h>
 
 #include <QAction>
@@ -27,11 +30,16 @@
 #include <QPushButton>
 #include <QStatusBar>
 
+#include <iterator>
+
 using namespace Utils;
 
 namespace FileEncoding::Internal {
 
 namespace {
+
+// The font sizes offered in the Tools menu.
+constexpr int kFontSizes[] = {10, 11, 12, 14, 16};
 
 // What happened while re-reading the open documents.
 struct ReloadSummary
@@ -91,11 +99,13 @@ public:
 
 private:
     void switchToEncoding(const TextEncoding &encoding);
+    void switchToFontSize(int size);
     void updateCheckedState();
     void reloadOpenDocuments(const TextEncoding &encoding, ReloadSummary &summary);
 
     QAction *m_utf8Action = nullptr;
     QAction *m_gbkAction = nullptr;
+    QAction *m_fontSizeActions[std::size(kFontSizes)] = {};
 };
 
 void FileEncodingPlugin::initialize()
@@ -122,28 +132,52 @@ void FileEncodingPlugin::initialize()
         .bindContextAction(&m_gbkAction)
         .addToContainer(Constants::MENU_ID)
         .addOnTriggered(this, [this] { switchToEncoding(gbkEncoding()); });
+
+    Core::MenuBuilder(Constants::MENU_FONT_SIZE_ID)
+        .setTitle(Tr::tr("文字字号(&S)"))
+        .setOnAllDisabledBehavior(Core::ActionContainer::Show)
+        .addToContainer(Core::Constants::M_TOOLS);
+
+    for (size_t i = 0; i < std::size(kFontSizes); ++i) {
+        const int size = kFontSizes[i];
+        Core::ActionBuilder(this, Utils::Id(Constants::ACTION_FONT_SIZE_PREFIX).withSuffix(size))
+            .setText(QString::number(size))
+            .setContext(Core::Constants::C_GLOBAL)
+            .setCheckable(true)
+            .bindContextAction(&m_fontSizeActions[i])
+            .addToContainer(Constants::MENU_FONT_SIZE_ID)
+            .addOnTriggered(this, [this, size] { switchToFontSize(size); });
+    }
 }
 
 void FileEncodingPlugin::extensionsInitialized()
 {
-    // The default encoding can also be changed in the settings dialog, so the
-    // check marks are refreshed whenever the menu is about to be shown.
-    if (Core::ActionContainer *menu = Core::ActionManager::actionContainer(Constants::MENU_ID)) {
-        if (QMenu *menuWidget = menu->menu())
-            connect(menuWidget, &QMenu::aboutToShow, this, &FileEncodingPlugin::updateCheckedState);
+    // Both settings can also be changed in the preferences dialog, so the
+    // check marks are refreshed whenever one of the menus is about to be shown.
+    const Utils::Id menuIds[] = {Constants::MENU_ID, Constants::MENU_FONT_SIZE_ID};
+    for (const Utils::Id &menuId : menuIds) {
+        if (Core::ActionContainer *menu = Core::ActionManager::actionContainer(menuId)) {
+            if (QMenu *menuWidget = menu->menu())
+                connect(menuWidget, &QMenu::aboutToShow, this, &FileEncodingPlugin::updateCheckedState);
+        }
     }
     updateCheckedState();
 }
 
 void FileEncodingPlugin::updateCheckedState()
 {
-    if (!m_utf8Action || !m_gbkAction)
-        return;
+    if (m_utf8Action && m_gbkAction) {
+        const TextEncoding current = Core::EditorManager::defaultTextEncoding();
+        const TextEncoding gbk = gbkEncoding();
+        m_utf8Action->setChecked(current.isUtf8());
+        m_gbkAction->setChecked(gbk.isValid() && current == gbk);
+    }
 
-    const TextEncoding current = Core::EditorManager::defaultTextEncoding();
-    const TextEncoding gbk = gbkEncoding();
-    m_utf8Action->setChecked(current.isUtf8());
-    m_gbkAction->setChecked(gbk.isValid() && current == gbk);
+    const int fontSize = TextEditor::TextEditorSettings::fontSettings().fontSize();
+    for (size_t i = 0; i < std::size(kFontSizes); ++i) {
+        if (QAction *action = m_fontSizeActions[i])
+            action->setChecked(kFontSizes[i] == fontSize);
+    }
 }
 
 void FileEncodingPlugin::switchToEncoding(const TextEncoding &encoding)
@@ -193,6 +227,49 @@ void FileEncodingPlugin::switchToEncoding(const TextEncoding &encoding)
         Core::MessageManager::writeFlashing(
             message + QLatin1Char('\n') + summary.failed.join(QLatin1Char('\n')));
     }
+}
+
+/*!
+    Sets the font size of the text editors to \a size.
+
+    Unlike the encoding this needs no reload: the editor widgets listen to
+    TextEditorSettings::fontSettingsChanged and re-apply the font when it is
+    emitted, so all open editors follow immediately while their documents,
+    undo history and unsaved changes stay untouched.
+
+    The settings page edits the very same FontSettings object, which is why the
+    const_cast is safe: fontSettings() only returns a const reference to keep
+    plugins from bypassing the preferences page, and this menu is meant to
+    replace exactly that page for the font size.
+*/
+void FileEncodingPlugin::switchToFontSize(int size)
+{
+    TextEditor::TextEditorSettings *settings = TextEditor::TextEditorSettings::instance();
+    auto &fontSettings = const_cast<TextEditor::FontSettings &>(
+        TextEditor::TextEditorSettings::fontSettings());
+
+    fontSettings.setFontSize(size);
+    fontSettings.toSettings(Core::ICore::settings());
+    settings->fontSettingsChanged(fontSettings);
+
+    updateCheckedState();
+
+    int updatedEditors = 0;
+    for (Core::IDocument *document : Core::DocumentModel::openedDocuments()) {
+        auto textDocument = qobject_cast<TextEditor::TextDocument *>(document);
+        if (textDocument
+            && !TextEditor::BaseTextEditor::textEditorsForDocument(textDocument).isEmpty()) {
+            ++updatedEditors;
+        }
+    }
+
+    QString message = Tr::tr("编辑器字号已切换为 %1").arg(size);
+    if (updatedEditors > 0)
+        message += Tr::tr("：%1 个已打开的文件已更新").arg(updatedEditors);
+    message += QStringLiteral("。");
+
+    if (QStatusBar *statusBar = Core::ICore::statusBar())
+        statusBar->showMessage(message, 5000);
 }
 
 /*!

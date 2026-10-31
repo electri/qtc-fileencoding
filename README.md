@@ -1,20 +1,29 @@
-# File Encoding plugin for Qt Creator 20.0.2
+# Editor shortcuts plugin for Qt Creator 20.0.2 (file encoding / font size)
 
 **English** | [简体中文](README-zh.md)
 
-Switches the default text file encoding of Qt Creator between **UTF-8** and **GBK**
-straight from the **Tools** menu, without opening *Preferences > Text Editor > Behavior*,
-and re-reads the files that are already open with the new encoding.
+Two things straight from the **Tools** menu, without opening *Preferences > Text Editor*:
+
+- switch the default file encoding between **UTF-8** and **GBK** and re-read the files
+  that are already open with the new encoding;
+- switch the editor font size between **10 / 11 / 12 / 14 / 16**, with every open editor
+  following immediately.
 
 ```
 Tools
-└── 文件编码            (File Encoding)
-    ├── ✓ UTF-8
-    └──   GBK
+├── 文件编码            (File Encoding)
+│   ├── ✓ UTF-8
+│   └──   GBK
+└── 文字字号            (Font Size)
+    ├──   10
+    ├── ✓ 11
+    ├──   12
+    ├──   14
+    └──   16
 ```
 
-The two entries are checkable and always show the encoding that is currently configured
-as default, no matter whether it was changed here or in the preferences dialog.
+All entries are checkable and always show the setting that is currently active, no matter
+whether it was changed here or in the preferences dialog.
 
 > The repository root is `src/plugins/fileencoding/` of a Qt Creator source tree.
 > The plugin has to be built together with the IDE (the `add_qtc_plugin` macro, the same Qt,
@@ -44,8 +53,24 @@ Details that are easy to get wrong:
 | File cannot be decoded in the new encoding | Counted in the status message and listed in the output pane |
 | Encoding is already the default | Still re-reads documents that are stuck in the other encoding, so the action doubles as a repair button |
 
-Because the labels are Chinese string literals in the source, the menu reads
-`文件编码 / UTF-8 / GBK` in any UI language, including an English one.
+### Font size
+
+A click on **10 / 11 / 12 / 14 / 16**:
+
+1. writes the very same font size the *Font & Colors* page uses (stored as
+   `[TextEditor] FontSize`);
+2. emits `TextEditorSettings::fontSettingsChanged`, so every open editor re-lays itself out
+   immediately, including margin, folding column and line height;
+3. reports the result in the status bar (`编辑器字号已切换为 16：2 个已打开的文件已更新。`).
+
+No file is re-read here, on purpose: the size only affects rendering, not the bytes on disk.
+Re-reading would throw away the undo stack for nothing and would ask for confirmation on
+modified documents. The encoding action re-reads because the encoding decides how the same
+bytes are decoded. Font family, zoom and line spacing are left alone.
+
+Because the labels are Chinese string literals in the source, the menus read
+`文件编码 / UTF-8 / GBK / 文字字号 / 10 / 11 / 12 / 14 / 16` in any UI language,
+including an English one.
 
 ## 2. Installation
 
