@@ -45,6 +45,22 @@ Qt Creator 的默认文件编码，并把已经打开的文件按新编码重新
 
 ## 2. 安装
 
+### 现成包（Windows x64，免编译）
+
+[`dist/FileEncoding-20.0.2-win64.zip`](dist/FileEncoding-20.0.2-win64.zip)（约 34 KB）是编译好的精简包，
+里面只有 `lib/qtcreator/plugins/FileEncoding.dll`、`README.txt`、`LICENSE.txt` 和 `SHA256.txt`：
+
+1. 关闭 Qt Creator；
+2. 把压缩包里的 `lib` 目录合并进 Qt Creator 安装根目录，最终为
+   `<安装目录>\lib\qtcreator\plugins\FileEncoding.dll`（例如
+   `C:\Qt\Tools\QtCreator-20.0.2\lib\qtcreator\plugins\`）；
+3. 重启 IDE，「工具 → 文件编码」即可使用。
+
+这个包只适用于 **Qt Creator 20.0.2 x64、MSVC 2022 构建的版本**——插件与宿主共享 C++ ABI，
+换编译器或跨大版本（21.x）必须按下文自行编译。卸载只需删掉那个 DLL。
+
+### 从源码编译安装
+
 ```bash
 cd <qtcreator源码目录>
 git clone https://github.com/electri/qtc-fileencoding.git src/plugins/fileencoding

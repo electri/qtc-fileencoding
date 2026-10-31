@@ -49,6 +49,24 @@ Because the labels are Chinese string literals in the source, the menu reads
 
 ## 2. Installation
 
+### Prebuilt package (Windows x64)
+
+[`dist/FileEncoding-20.0.2-win64.zip`](dist/FileEncoding-20.0.2-win64.zip) (about 34 KB) is a
+minimal build: `lib/qtcreator/plugins/FileEncoding.dll`, `README.txt`, `LICENSE.txt`
+and `SHA256.txt`, nothing else.
+
+1. Close Qt Creator.
+2. Merge the `lib` folder of the archive into the Qt Creator installation root, so that
+   `<install>\lib\qtcreator\plugins\FileEncoding.dll` exists (for example
+   `C:\Qt\Tools\QtCreator-20.0.2\lib\qtcreator\plugins\`).
+3. Restart the IDE; the menu shows up under **Tools > 文件编码**.
+
+The package only works with **Qt Creator 20.0.2 x64 built with MSVC 2022** — plugins share
+the C++ ABI with the host, so a different compiler or a major version (21.x) needs a rebuild
+as described below. Uninstalling means deleting that single DLL.
+
+### Building from source
+
 ```bash
 cd <qtcreator-source>
 git clone https://github.com/electri/qtc-fileencoding.git src/plugins/fileencoding
