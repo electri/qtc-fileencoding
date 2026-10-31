@@ -1,0 +1,4 @@
+# Normalise the sources to LF.
+* text=auto eol=lf
+
+*.png binary

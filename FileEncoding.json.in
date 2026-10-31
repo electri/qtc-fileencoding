@@ -1,0 +1,17 @@
+{
+    "Id" : "fileencoding",
+    "DisplayName" : "文件编码",
+    "Name" : "FileEncoding",
+    "Version" : "${IDE_VERSION}",
+    "CompatVersion" : "${IDE_VERSION_COMPAT}",
+    "VendorId" : "qtc-fileencoding",
+    "Vendor" : "File Encoding Plugin",
+    "Copyright" : "(C) 2026 The File Encoding Plugin Authors",
+    "License" : [ "GNU General Public License Usage",
+                  "",
+                  "This plugin is distributed under the terms of the GNU General Public License version 3 as published by the Free Software Foundation, with the Qt Creator exception as present in the file LICENSE.GPL3-EXCEPT of the Qt Creator sources."
+    ],
+    "Description" : "Switches the default text file encoding between UTF-8 and GBK directly from the Tools menu and re-reads the already opened files with the new encoding.",
+    "Url" : "https://www.qt.io/",
+    ${IDE_PLUGIN_DEPENDENCIES}
+}

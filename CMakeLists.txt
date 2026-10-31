@@ -1,0 +1,11 @@
+add_qtc_plugin(FileEncoding
+  DEPENDS
+    Qt::Widgets
+  PLUGIN_DEPENDS
+    Core
+    TextEditor
+  SOURCES
+    fileencodingconstants.h
+    fileencodingplugin.cpp
+    fileencodingtr.h
+)
